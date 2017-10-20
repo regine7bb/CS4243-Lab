@@ -1,0 +1,48 @@
+FNames={'leaves_gray.jpg';
+    'flower_pot_gray.jpg';
+    'orchid_gray.jpg'};
+
+ for p=1:size(FNames)
+    pic =imread(FNames{p});
+    numRows = size(pic, 1);
+    numCols = size(pic, 2);
+    stretchPic = zeros(numRows,numCols);
+    stretch = zeros(256,1);
+
+    edgeH = zeros(numRows,numCols);
+    edgeV = zeros(numRows,numCols);
+    edgeStr = zeros(numRows,numCols);
+    
+    %sobel edge detector
+    kernelH = [-1 0 1; -2 0 2; -1 0 1];
+    kernelV = [1 2 1; 0 0 0; -1 -2 -1];
+        
+    for i = 2: numRows-1
+        for j = 2 : numCols -1;
+            filterWindow = [stretchPic(i-1,j-1) stretchPic(i,j-1) stretchPic(i+1,j-1);
+                           stretchPic(i-1,j) stretchPic(i,j) stretchPic(i+1,j);
+                           stretchPic(i-1,j+1) stretchPic(i,j+1) stretchPic(i+1,j+1)];
+
+            edgeH(i,j) = double((sum(sum(kernelH.*filterWindow))));
+            edgeV(i,j) = double((sum(sum(kernelV.*filterWindow))));
+            edgeStr(i,j) = round(sqrt(edgeH(i,j).^2 + edgeV(i,j).^2));
+        end
+    end
+        
+    fig1=figure;
+    imshow(pic,[]);
+    title('original image');
+
+    fig3=figure;
+    imshow(edgeStr,[]);
+    title('edge strength image');
+
+    baseName = FNames{p}(1:find(FNames{p}=='.')-1);
+    figNameOriginal=strcat(baseName,'_original_results.jpg');
+    figNameEdge=strcat(baseName,'_edge_strength_results.jpg');
+    
+    print(fig1,'-djpeg',figNameOriginal);
+    print(fig2,'-djpeg',figNameStretch);
+    print(fig3,'-djpeg',figNameEdge);
+    
+ end
